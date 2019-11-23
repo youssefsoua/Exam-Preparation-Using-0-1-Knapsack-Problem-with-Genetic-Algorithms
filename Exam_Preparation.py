@@ -1,4 +1,3 @@
-
 import numpy as np
 import random
 import csv
@@ -59,6 +58,21 @@ def roulette_wheel_selection(pop):
     return pop[i]
 
 
+def tour_selection(pop):
+    selected = np.empty(4, dtype=Chromosome)
+    i = 0
+    while i < 3:
+        selected[i] = pop[random.randint(0, POP_SIZE-1)]
+        i += 1
+    i = 1
+    highest_fitness = 0
+    while i < 3:
+        if selected[i].get_fitness() > selected[highest_fitness].get_fitness():
+            highest_fitness = i
+        i += 1
+    return selected[highest_fitness]
+
+
 def crossover(parent1, parent2):
     cp = random.randint(0, len(parent1.genes)-1)
     p1 = parent1.genes[:cp]
@@ -96,6 +110,10 @@ def evolve(pop):
     parent_2 = roulette_wheel_selection(pop)
     parent_3 = roulette_wheel_selection(pop)
 
+    # parent_1 = tour_selection(pop)
+    # parent_2 = tour_selection(pop)
+    # parent_3 = tour_selection(pop)
+
     child_1 = crossover(parent_1, parent_2)
     child_2 = crossover(parent_2, parent_1)
     child_3 = crossover(parent_1, parent_3)
@@ -129,6 +147,15 @@ def print_pop(pop):
         print(pop[i].get_genes())
 
 
+def final_result(chromosome):
+    result = ''
+    for (selected, (chapter, _, _)) in zip(chromosome, DataSet):
+        if selected == 1:
+            result = result + chapter + ','
+
+    return result
+
+
 # main
 generation_number = 0
 population = np.array([Chromosome() for _ in range(POP_SIZE)])
@@ -146,5 +173,5 @@ while population[0].get_fitness() < WANTED_MARK and generation_number < MAX_GEN:
     print("-------")
     print("best fitness:", population[0].get_fitness())
 
-print("******************")
-print(population[0].get_fitness())
+print("********final result**********")
+print("chapters to study:", final_result(population[0].genes))
